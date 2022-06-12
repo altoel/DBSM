@@ -77,16 +77,15 @@ uint64_t page::find(char *key){
 
 		if (strcmp(key, get_key(data_region)) == 0) { // success
 			val = get_val((void*)get_key(data_region));
-
+			
 			//test
-			//printf("val : %lu\n", val);
-			break;
+			printf("found val : %lu\n", val);
+			return val;
 		}
 		else if(strcmp(key, get_key(data_region)) < 0) {
-			printf("search failed\n");
-
 			if(i = 0){ //smallest
 				val = -1 * (uint64_t)leftmost_ptr; //fail
+
 				break;
 			} 
 			else { //mid
@@ -94,6 +93,7 @@ uint64_t page::find(char *key){
 				data_region = (void*)((uint64_t)this + (uint64_t)off);
 				val = get_val((void*)get_key(data_region));
 				val = -1 * val; //fail
+
 				break;
 			}
 		}
@@ -104,6 +104,7 @@ uint64_t page::find(char *key){
 	data_region = (void*)((uint64_t)this + (uint64_t)off);
 	val = get_val((void*)get_key(data_region));
 	val = -1 * val; //fail
+
 	return val;
 }
 
@@ -149,7 +150,7 @@ bool page::insert(char *key, uint64_t val){
 	printf("k_r : %lu, k : %s, g_k : %s | v_r : %lu, v : %lu\n", (uint64_t)key_region, k, (char *)key_region, (uint64_t)val_region, v);*/
 
 	hdr.set_num_data(num_data+1); //num_data + 1
-	printf("at page %p, key %s successfully inserted\n", this, key);
+	printf("at page %p, key %s | val %lu successfully inserted\n", this, key, val);
 	return true;
 }
 
@@ -157,6 +158,9 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 	// Please implement this function in project 2.
 	// this func will be called when the node is full
 	// so num_data = degree of btree
+
+	//test	
+	printf("split occured\n");
 
 	page* new_page = new page(get_type());
 	int num_data = hdr.get_num_data();
@@ -176,11 +180,12 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 		if (strcmp(key, (char*)stored_key) < 0) {
 			if (i <= mid) { //if 'new record' is in node's 'first ~ mid'
 				//test
-				//printf("if 'new record' is in node's 'first ~ mid'\n");
+				printf("if 'new record' is in node's 'first ~ mid'\n");
 
 				page* temp_page = new page(get_type());
 
 				for (int j = mid; j < num_data; j++) { //'mid ~ end' to new page
+
 					off = *(uint16_t*)((uint64_t)offset_array + j * 2);
 					data_region = (void*)((uint64_t)this + (uint64_t)off);
 					stored_key = get_key(data_region);
@@ -188,6 +193,7 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 					new_page->insert((char*)stored_key, stored_val);				
 				}
 				for (int j = 0; j < i; j++) {
+
 					off = *(uint16_t*)((uint64_t)offset_array + j * 2);
 					data_region = (void*)((uint64_t)this + (uint64_t)off);
 					stored_key = get_key(data_region);
@@ -196,6 +202,7 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 				}
 				temp_page->insert(key, val); //new record
 				for (int j = i; j < mid; j++) {
+
 					off = *(uint16_t*)((uint64_t)offset_array + j * 2);
 					data_region = (void*)((uint64_t)this + (uint64_t)off);
 					stored_key = get_key(data_region);
@@ -208,7 +215,8 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 				hdr.set_offset_array((void*)((uint64_t)this + sizeof(slot_header)));
 				delete temp_page;
 
-				break;
+				printf("split is done\n\n");
+				return new_page;
 			}
 			else { //if 'new record' is in node's 'mid ~ end'
 				for (int j = mid + 1; j < i; j++) {
@@ -235,7 +243,8 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 				hdr.set_num_data(num_data+1); //for mid record to remain at original node
 				defrag(); //clean original node
 
-				break;
+				printf("split is done\n\n");
+				return new_page;
 			}
 		}
 	}

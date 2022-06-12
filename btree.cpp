@@ -22,7 +22,6 @@ void btree::insert(char *key, uint64_t val){
 			//test
 			//printf("parent malloc : %p | %p\n", parent_key, &parent_key);
 
-			printf("\nsplit occured\n");
 			page *new_page = root->split(key, val, &parent_key);
 
 			new_root->insert(parent_key, (uint64_t)new_page);
@@ -31,7 +30,7 @@ void btree::insert(char *key, uint64_t val){
 			root = new_root;
 			height++;
 		}
-		printf("at root, record successfully inserted\n");
+		printf("at root, record successfully inserted\n\n");
 
 		return;
 	}
