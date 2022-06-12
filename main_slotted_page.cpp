@@ -40,6 +40,15 @@ int main(){
 
 	//test
 	printf("\n");
+
+	/*split test*/
+	//char* parent_key = (char*)"cat";
+	///*first*/p->split((char*)"a\0", 148, &parent_key);
+	///*first ~ mid*/p->split((char*)"bbbbbbbbbbccccccccc\0", 148, &parent_key);
+	///*mid ~ end*/p->split((char*)"eeeeeeeeeeccccccccc\0", 148, &parent_key);
+	///*last*/p->split((char*)"testtesttesttesttes\0", 148, &parent_key);
+	
+	/*print test*/
 	p->print();
 
 	return 0;

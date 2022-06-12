@@ -8,10 +8,15 @@ btree::btree(){
 
 void btree::insert(char *key, uint64_t val){
 	// Please implement this function in project 2.
+
+
 }
 
 uint64_t btree::lookup(char *key){
 	// Please implement this function in project 2.
+
 	uint64_t val = 0;
+
+
 	return val;
 }
