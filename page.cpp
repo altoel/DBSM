@@ -218,6 +218,8 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 }
 
 bool page::is_full(uint64_t inserted_record_size){
+	// Please implement this function in project 1.
+
 	int num_data = hdr.get_num_data();
 	uint64_t MAX_SIZE = PAGE_SIZE - sizeof(slot_header) - sizeof(page*);
 	return (inserted_record_size + sizeof(uint16_t) * num_data >= MAX_SIZE);
