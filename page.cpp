@@ -13,7 +13,7 @@ uint16_t get2byte(void* dest) {
 
 page::page(uint16_t type) {
 	hdr.set_num_data(0);
-	hdr.set_data_region_off(PAGE_SIZE - 1);
+	hdr.set_data_region_off(PAGE_SIZE - 1 - sizeof(page*));
 	hdr.set_offset_array((void*)((uint64_t)this + sizeof(slot_header)));
 	hdr.set_page_type(type);
 }
