@@ -21,7 +21,6 @@ int main(){
 	}
 
 	val = 100;
-	cnt = 0;
 	for(i='a'; i<='j'; i++){
 		for(int j=0; j<STRING_LEN-1; j++){
 			key[j] = i;

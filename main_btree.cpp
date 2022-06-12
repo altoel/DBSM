@@ -7,8 +7,8 @@ int main(){
 
 	char key[STRING_LEN];
 	char i;
-	int val = 100;
-	int cnt = 0;
+	uint64_t val = 100;
+	uint64_t cnt = 0;
 
 	for(i='a'; i<='z'; i+=1){
 		for(int j=0; j<STRING_LEN-1; j++){
