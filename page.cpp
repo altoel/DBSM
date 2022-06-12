@@ -66,46 +66,52 @@ uint64_t page::find(char *key){
 	uint16_t off = 0;
 	void* data_region = nullptr;
 
-
 	for (int i = 0; i < num_data; i++) {
 		off = *(uint16_t*)((uint64_t)offset_array + i * 2);
 		data_region = (void*)((uint64_t)this + (uint64_t)off);
-
 		//test
 		//printf("find_data_r : %lu\n", (uint64_t)data_region);
 		//printf("finding key : %s, get_key_result : %s\n", key, get_key(data_region));
 
 		if (strcmp(key, get_key(data_region)) == 0) { // success
 			val = get_val((void*)get_key(data_region));
-			
 			//test
-			printf("found val : %lu\n", val);
-			return val;
-		}
-		else if(strcmp(key, get_key(data_region)) < 0) {
-			if(i = 0){ //smallest
-				val = -1 * (uint64_t)leftmost_ptr; //fail
+			//printf("left? : %d\n", (uint64_t)leftmost_ptr == val);
 
-				break;
+			if (get_type() == LEAF) printf("found val : %lu\n", val);
+
+			return val; //success
+		}
+		else if(strcmp(key, get_key(data_region)) < 0) { //fail
+			//test
+			//printf("search failed | %s | i : %d\n", get_key(data_region), i);
+
+			if(i == 0){ //smallest
+				if (get_type() == INTERNAL) return (uint64_t)leftmost_ptr;
+				else {
+					printf("search failed\n");
+					return 0;
+				}
 			} 
-			else { //mid
+			else { //mid 
 				off = *(uint16_t*)((uint64_t)offset_array + (i-1) * 2);
 				data_region = (void*)((uint64_t)this + (uint64_t)off);
-				val = get_val((void*)get_key(data_region));
-				val = -1 * val; //fail
 
-				break;
+				if (get_type() == INTERNAL) return (get_val((void*)get_key(data_region)));
+				else {
+					printf("search failed\n");
+					return 0;
+				}
 			}
 		}
 	}
-	//biggest
-	printf("search failed\n");
+	//biggest //fail
 	off = *(uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2);
 	data_region = (void*)((uint64_t)this + (uint64_t)off);
-	val = get_val((void*)get_key(data_region));
-	val = -1 * val; //fail
 
-	return val;
+	printf("search failed3\n");
+	if (get_type() == INTERNAL) return (get_val((void*)get_key(data_region)));
+	else return 0;
 }
 
 bool page::insert(char *key, uint64_t val){
@@ -124,7 +130,7 @@ bool page::insert(char *key, uint64_t val){
 	void* key_region = nullptr;
 	void* val_region = nullptr;
 	if (num_data == 0){
-		leftmost_ptr = nullptr;
+		leftmost_ptr = this;
 		off = PAGE_SIZE - record_size;
 	} else {
 		inserted_record_size = PAGE_SIZE - get2byte((uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2));
