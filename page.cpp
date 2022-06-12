@@ -80,13 +80,31 @@ uint64_t page::find(char *key){
 
 			//test
 			//printf("val : %lu\n", val);
+			break;
+		}
+		else if(strcmp(key, get_key(data_region)) < 0) {
+			printf("search failed\n");
 
-			return val;
+			if(i = 0){ //smallest
+				val = -1 * (uint64_t)leftmost_ptr; //fail
+				break;
+			} 
+			else { //mid
+				off = *(uint16_t*)((uint64_t)offset_array + (i-1) * 2);
+				data_region = (void*)((uint64_t)this + (uint64_t)off);
+				val = get_val((void*)get_key(data_region));
+				val = -1 * val; //fail
+				break;
+			}
 		}
 	}
-
+	//biggest
 	printf("search failed\n");
-	return val; //return 0;
+	off = *(uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2);
+	data_region = (void*)((uint64_t)this + (uint64_t)off);
+	val = get_val((void*)get_key(data_region));
+	val = -1 * val; //fail
+	return val;
 }
 
 bool page::insert(char *key, uint64_t val){
@@ -105,6 +123,7 @@ bool page::insert(char *key, uint64_t val){
 	void* key_region = nullptr;
 	void* val_region = nullptr;
 	if (num_data == 0){
+		leftmost_ptr = nullptr;
 		off = PAGE_SIZE - record_size;
 	} else {
 		inserted_record_size = PAGE_SIZE - get2byte((uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2));
@@ -244,10 +263,11 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 	uint16_t new_off = *(uint16_t*)((uint64_t)newP_offset_array);
 	void* new_data_region = (void*)((uint64_t)new_page + (uint64_t)new_off);
 	char* new_key = (char*)((uint64_t)new_data_region + sizeof(uint16_t));
-	parent_key = &new_key;
+	*parent_key = new_key;
 
 	//test
-	//printf("Parent_key | key : %s  %p\t, parent : %s  %p\n", new_key, &new_key, *parent_key, parent_key);
+	//printf("new_key : %s  %p\nParent_key : %s %p | %p\n", new_key, &new_key, *parent_key, *parent_key, parent_key);
+	printf("split is done\n\n");
 
 	return new_page;
 }
