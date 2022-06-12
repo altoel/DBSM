@@ -22,10 +22,12 @@ void btree::insert(char *key, uint64_t val){
 			//printf("parent malloc : %p | %p\n", parent_key, &parent_key);
 
 			page *new_page = root->split(key, val, &parent_key);
+			//test
+			//printf("new_page : %lu\n", (uint64_t)new_page);
 
 			page *new_root = new page(INTERNAL);
-			new_root->insert(parent_key, (uint64_t)new_page);
 			new_root->set_leftmost_ptr(root);
+			new_root->insert(parent_key, (uint64_t)new_page);
 
 			root = new_root;
 			height++;

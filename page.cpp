@@ -76,11 +76,11 @@ uint64_t page::find(char *key){
 		if (strcmp(key, get_key(data_region)) == 0) { // success
 			val = get_val((void*)get_key(data_region));
 			//test
-			//printf("left? : %d\n", (uint64_t)leftmost_ptr == val);
+			//if (get_type() == INTERNAL) printf("left : %lu | right : %lu\n", (uint64_t)leftmost_ptr,val);
 
 			if (get_type() == LEAF) printf("found val : %lu\n", val);
 
-			return val; //success
+			return val;
 		}
 		else if(strcmp(key, get_key(data_region)) < 0) { //fail
 			//test
@@ -109,7 +109,7 @@ uint64_t page::find(char *key){
 	off = *(uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2);
 	data_region = (void*)((uint64_t)this + (uint64_t)off);
 
-	printf("search failed3\n");
+	printf("search failed3 | %lu\n", (get_val((void*)get_key(data_region))));
 	if (get_type() == INTERNAL) return (get_val((void*)get_key(data_region)));
 	else return 0;
 }
@@ -130,8 +130,8 @@ bool page::insert(char *key, uint64_t val){
 	void* key_region = nullptr;
 	void* val_region = nullptr;
 	if (num_data == 0){
-		leftmost_ptr = this;
-		off = PAGE_SIZE - record_size;
+		off = hdr.get_data_region_off()- record_size;
+		//off = PAGE_SIZE - record_size;
 	} else {
 		inserted_record_size = PAGE_SIZE - get2byte((uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2));
 		if (is_full(inserted_record_size)) {
@@ -150,10 +150,10 @@ bool page::insert(char *key, uint64_t val){
 	*(uint64_t*)val_region = val; //store val
 	
 	//test
-	/*auto t = *key;
-	auto k = (char*)key_region;
-	auto v = *(uint64_t*)val_region;
-	printf("k_r : %lu, k : %s, g_k : %s | v_r : %lu, v : %lu\n", (uint64_t)key_region, k, (char *)key_region, (uint64_t)val_region, v);*/
+	// auto t = *key;
+	// auto k = (char*)key_region;
+	// auto v = *(uint64_t*)val_region;
+	// printf("k_r : %lu, k : %s, g_k : %s | v_r : %lu, v : %lu\n", (uint64_t)key_region, k, (char *)key_region, (uint64_t)val_region, v);
 
 	hdr.set_num_data(num_data+1); //num_data + 1
 	printf("at page %p, key %s | val %lu successfully inserted\n", this, key, val);
