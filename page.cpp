@@ -109,9 +109,11 @@ uint64_t page::find(char *key){
 	off = *(uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2);
 	data_region = (void*)((uint64_t)this + (uint64_t)off);
 
-	printf("search failed");
 	if (get_type() == INTERNAL) return (get_val((void*)get_key(data_region)));
-	else return 0;
+	else {
+		printf("search failed\n");
+		return 0;
+	}
 }
 
 bool page::insert(char *key, uint64_t val){
@@ -228,7 +230,7 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 				return new_page;
 			}
 			else { //if 'new record' is in node's 'mid ~ end'
-				for (int j = mid + 1; j < i; j++) {
+				for (int j = mid; j < i; j++) {
 					//test
 					//printf("if 'new record' is in node's 'mid ~ end'\n");
 
@@ -258,7 +260,7 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 		}
 	}
 	//if 'new record' is bigger than 'end'
-	for (int j = mid + 1; j < num_data; j++) {
+	for (int j = mid; j < num_data; j++) {
 		//test
 		//printf("if 'new record' is bigger than 'end'\n");
 
@@ -273,7 +275,7 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 	//test
 	//printf("then clean original node\n");
 
-	hdr.set_num_data(num_data+1); //for mid record to remain at original node
+	//hdr.set_num_data(num_data+1); //for mid record to remain at original node
 	defrag(); //clean original node
 
 

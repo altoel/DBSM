@@ -8,14 +8,12 @@ btree::btree(){
 
 void btree::insert(char *key, uint64_t val){
 	// Please implement this function in project 2.
-	bool flag = false;
 	page * p = root;
 
 	if (p->get_type() == LEAF) { //only root node
 		height = 1;
-		flag = root->insert(key, val); 
 
-		if (!flag) { //if root already full
+		if (!root->insert(key, val)) {
 			int key_len = 0;
 			while (key[key_len] != '\0') key_len++;
 			char* parent_key = (char *)malloc(key_len + 1);
@@ -34,8 +32,6 @@ void btree::insert(char *key, uint64_t val){
 			height++;
 		}
 		//printf("at root, record successfully inserted\n\n");
-
-		return;
 	}
 	else {
 		page *stack[height];
@@ -44,32 +40,40 @@ void btree::insert(char *key, uint64_t val){
 			stack[stack_cnt++] = p;
 			p = (page*)p->find(key);
 		}
-		
-		for (size_t i = stack_cnt-1; i < stack_cnt; i--) {
+
+		char* parent_key = key;
+		uint64_t parent_val = val;
+		page *new_page;
+		//page *old_page;
+		for (size_t i = stack_cnt-1; i >= 0; i--) {
+			printf("carrot1\n");
+			if (p->insert(parent_key, parent_val)) {
+				return;
+			}
+			else {
+				new_page = p->split(parent_key, parent_val, &parent_key);
+				parent_val = (uint64_t)new_page;
+				//old_page = p;
+			}
 			p = stack[i];
-			flag = p->insert(key, val);
+			if (i == 0) { //p is root
+				if (p->insert(parent_key, parent_val)) {
+					return;
+				}
+				else {
+					new_page = root->split(parent_key, parent_val, &parent_key);
+					page *new_root = new page(INTERNAL);
+					new_root->set_leftmost_ptr(p);
+					new_root->insert(parent_key, (uint64_t)new_page);
 
-			if (!flag) {
-			int key_len = 0;
-			while (key[key_len] != '\0') key_len++;
-			char* parent_key = (char *)malloc(key_len + 1);
-			uint64_t parent_val = 0;
-
-			page *new_page = p->split(key, val, &parent_key);
-			parent_val = 
-
-			page *new_parent = new page(INTERNAL);
-			new_parent->set_leftmost_ptr(p);
-			new_parent->insert(parent_key, (uint64_t)new_page);
-
-			p = new_parent;
-			height++;
-		}
-		}
-		
-		
+					root = new_root;
+					height++;
+				}
+			}
+		}	
 	}
-	
+
+	return;
 	
 }
 
