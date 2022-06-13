@@ -9,8 +9,9 @@ btree::btree(){
 void btree::insert(char *key, uint64_t val){
 	// Please implement this function in project 2.
 	bool flag = false;
+	page * p = root;
 
-	if (root->get_type() == LEAF) { //only root node
+	if (p->get_type() == LEAF) { //only root node
 		height = 1;
 		flag = root->insert(key, val); 
 
@@ -32,13 +33,41 @@ void btree::insert(char *key, uint64_t val){
 			root = new_root;
 			height++;
 		}
-		printf("at root, record successfully inserted\n\n");
+		//printf("at root, record successfully inserted\n\n");
 
 		return;
 	}
 	else {
-		// page * p = root;
+		page *stack[height];
+		int stack_cnt = 0;
+		while (p->get_type() != LEAF){
+			stack[stack_cnt++] = p;
+			p = (page*)p->find(key);
+		}
+		
+		for (size_t i = stack_cnt-1; i < stack_cnt; i--) {
+			p = stack[i];
+			flag = p->insert(key, val);
 
+			if (!flag) {
+			int key_len = 0;
+			while (key[key_len] != '\0') key_len++;
+			char* parent_key = (char *)malloc(key_len + 1);
+			uint64_t parent_val = 0;
+
+			page *new_page = p->split(key, val, &parent_key);
+			parent_val = 
+
+			page *new_parent = new page(INTERNAL);
+			new_parent->set_leftmost_ptr(p);
+			new_parent->insert(parent_key, (uint64_t)new_page);
+
+			p = new_parent;
+			height++;
+		}
+		}
+		
+		
 	}
 	
 	

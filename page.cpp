@@ -78,7 +78,7 @@ uint64_t page::find(char *key){
 			//test
 			//if (get_type() == INTERNAL) printf("left : %lu | right : %lu\n", (uint64_t)leftmost_ptr,val);
 
-			if (get_type() == LEAF) printf("found val : %lu\n", val);
+			if (get_type() == LEAF) printf("\nfound val : %lu\n", val);
 
 			return val;
 		}
@@ -109,7 +109,7 @@ uint64_t page::find(char *key){
 	off = *(uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2);
 	data_region = (void*)((uint64_t)this + (uint64_t)off);
 
-	printf("search failed3 | %lu\n", (get_val((void*)get_key(data_region))));
+	printf("search failed");
 	if (get_type() == INTERNAL) return (get_val((void*)get_key(data_region)));
 	else return 0;
 }
