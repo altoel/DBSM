@@ -133,7 +133,8 @@ bool page::insert(char *key, uint64_t val){
 		off = hdr.get_data_region_off()- record_size;
 		//off = PAGE_SIZE - record_size;
 	} else {
-		inserted_record_size = PAGE_SIZE - get2byte((uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2));
+		inserted_record_size = hdr.get_data_region_off() - get2byte((uint16_t*)((uint64_t)offset_array + (num_data - 1) * 2))
+								+ record_size + sizeof(uint16_t) * (num_data+1);
 		if (is_full(inserted_record_size)) {
 			printf("at page %p, key %s insertion failed : this page is already full\n", this, key);
 			return false;
@@ -154,6 +155,8 @@ bool page::insert(char *key, uint64_t val){
 	// auto k = (char*)key_region;
 	// auto v = *(uint64_t*)val_region;
 	// printf("k_r : %lu, k : %s, g_k : %s | v_r : %lu, v : %lu\n", (uint64_t)key_region, k, (char *)key_region, (uint64_t)val_region, v);
+	//printf( "real off %d\n" ,*(uint16_t*) ( (uint64_t)offset_array + num_data * 2 ) );
+	//printf("off %d | hdr+offarr %lu\n", off,sizeof(hdr) + sizeof(uint16_t)*num_data + 1);
 
 	hdr.set_num_data(num_data+1); //num_data + 1
 	printf("at page %p, key %s | val %lu successfully inserted\n", this, key, val);
@@ -289,10 +292,11 @@ page* page::split(char *key, uint64_t val, char** parent_key){
 
 bool page::is_full(uint64_t inserted_record_size){
 	// Please implement this function in project 1.
+	uint64_t MAX_SIZE = PAGE_SIZE - sizeof(slot_header) - sizeof(page*) - 1;
 
-	int num_data = hdr.get_num_data();
-	uint64_t MAX_SIZE = PAGE_SIZE - sizeof(slot_header) - sizeof(page*);
-	return (inserted_record_size + sizeof(uint16_t) * num_data >= MAX_SIZE);
+	//printf("inserted %lu | max %lu\n", inserted_record_size, MAX_SIZE);
+
+	return (inserted_record_size >= MAX_SIZE);
 }
 
 void page::defrag() {
